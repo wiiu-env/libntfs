@@ -37,8 +37,11 @@
 #include "ntfsinternal.h"
 #include "ntfsfile.h"
 #include "ntfsdir.h"
+
 #include "gekko_io.h"
+
 #include "cache.h"
+
 
 // NTFS device driver devoptab
 static const devoptab_t devops_ntfs = {
@@ -197,7 +200,7 @@ int ntfsFindPartitions (const DISC_INTERFACE *interface, sec_t **partitions)
                                     if (sector.boot.oem_id == NTFS_OEM_ID) {
                                         ntfs_log_debug("Logical Partition @ %d: Valid NTFS boot sector found\n", part_lba);
                                         if(sector.ebr.partition.type != PARTITION_TYPE_NTFS) {
-                                            ntfs_log_warning("Logical Partition @ %d: Is NTFS but type is 0x%x; 0x%x was expected\n", part_lba, sector.ebr.partition.type, PARTITION_TYPE_NTFS);
+                                            ntfs_log_warning("Logical Partition @ %d: Is NTFS but type is 0x%x; 0x%x was expected\n", (int)  part_lba, sector.ebr.partition.type, PARTITION_TYPE_NTFS);
                                         }
                                         if (partition_count < NTFS_MAX_PARTITIONS) {
                                             partition_starts[partition_count] = part_lba;
@@ -317,6 +320,27 @@ int ntfsMountAll (ntfs_md **mounts, u32 flags)
 
             }
             ntfs_free(partitions);
+        }else if(partition_count == 0){
+            int k = 0;
+            // Find the next unused mount name
+            do {
+                sprintf(name, "%s%i", NTFS_MOUNT_PREFIX, k++);
+                if (k >= NTFS_MAX_MOUNTS) {
+                    ntfs_free(partitions);
+                    errno = EADDRNOTAVAIL;
+                    return -1;
+                }
+            } while (ntfsGetDevice(name, false));
+
+            // Mount the partition
+            if (mount_count < NTFS_MAX_MOUNTS) {
+                if (ntfsMount(name, disc->interface, 0, CACHE_DEFAULT_PAGE_SIZE, CACHE_DEFAULT_PAGE_COUNT, flags)) {
+                    strcpy(mount_points[mount_count].name, name);
+                    mount_points[mount_count].interface = disc->interface;
+                    mount_points[mount_count].startSector = 0;
+                    mount_count++;
+                }
+            }
         }
     }
 

@@ -38,10 +38,21 @@
 #include "reparse.h"
 #include "security.h"
 #include "efs.h"
+#include "lock.h"
 #include "unistr.h"
 
-#include <gccore.h>
-#include <ogc/disc_io.h>
+#if   defined (__WIIU__)
+    #include <iosuhax_disc_interface.h>
+    typedef uint8_t u8;
+    typedef uint16_t u16;
+    typedef int32_t s32;
+    typedef uint32_t u32;
+    typedef int mutex_t;
+#elif defined(__gamecube__) || defined (__wii__)
+    #include <ogc/disc_io.h>
+    #include <gccore.h>
+#endif
+
 #include <sys/iosupport.h>
 
 #define NTFS_MOUNT_PREFIX                   "ntfs" /* Device name prefix to use when auto-mounting */
@@ -141,13 +152,13 @@ typedef struct _ntfs_vd {
 /* Lock volume */
 static inline void ntfsLock (ntfs_vd *vd)
 {
-    LWP_MutexLock(vd->lock);
+    _NTFS_lock((mutex_t *)&vd->lock);
 }
 
 /* Unlock volume */
 static inline void ntfsUnlock (ntfs_vd *vd)
 {
-    LWP_MutexUnlock(vd->lock);
+    _NTFS_unlock((mutex_t *)&vd->lock);
 }
 
 /* Gekko device related routines */

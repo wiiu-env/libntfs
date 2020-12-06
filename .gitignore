@@ -1,0 +1,5 @@
+source/wiiu_release/*
+source/wii_release/*
+source/cube_release/*
+lib/*
+.idea/*

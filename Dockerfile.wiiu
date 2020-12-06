@@ -1,0 +1,11 @@
+FROM wiiuenv/devkitppc:20200810
+
+COPY --from=wiiuenv/libiosuhax:20200812 /artifacts $DEVKITPRO
+
+WORKDIR tmp_build
+COPY . .
+RUN make clean && make wiiu-release && mkdir -p /artifacts/wut/usr && cp -r lib /artifacts/wut/usr && cp -r include //artifacts/wut/usr
+WORKDIR /artifacts
+
+FROM scratch
+COPY --from=0 /artifacts /artifacts

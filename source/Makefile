@@ -7,12 +7,17 @@ ifeq ($(strip $(DEVKITPPC)),)
 $(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>devkitPPC")
 endif
 
+ifeq ($(PLATFORM),wiiu)
+    include $(DEVKITPRO)/wut/share/wut_rules
+    MACHDEP += -D__WIIU__
+endif
+
 ifeq ($(PLATFORM),wii)
-include $(DEVKITPPC)/wii_rules
+    include $(DEVKITPPC)/wii_rules
 endif
 
 ifeq ($(PLATFORM),cube)
-include $(DEVKITPPC)/gamecube_rules
+    include $(DEVKITPPC)/gamecube_rules
 endif
 
 #---------------------------------------------------------------------------------
@@ -20,7 +25,7 @@ endif
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-BUILD		?=	wii_release
+BUILD		?=	wiiu_release
 SOURCES		:=	.
 INCLUDES	:=	../include
 LIBDIR		:=	../lib
@@ -28,7 +33,7 @@ LIBDIR		:=	../lib
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-CFLAGS		=	-Os -Wall -ffast-math -pipe $(MACHDEP) $(INCLUDE) -DHAVE_CONFIG_H
+CFLAGS		=	-Wall -ffast-math -pipe  $(MACHDEP) $(INCLUDE) -ffunction-sections -DHAVE_CONFIG_H
 CXXFLAGS	=	$(CFLAGS)
 ASFLAGS		:=	-g
 export NTFSBIN	:= $(LIBDIR)/$(PLATFORM)/libntfs.a
@@ -37,7 +42,13 @@ ifeq ($(BUILD),cube_debug)
 CFLAGS += -DDEBUG
 CXXFLAGS += -DDEBUG
 endif
+
 ifeq ($(BUILD),wii_debug)
+CFLAGS += -DDEBUG
+CXXFLAGS += -DDEBUG
+endif
+
+ifeq ($(BUILD),wiiu_debug)
 CFLAGS += -DDEBUG
 CXXFLAGS += -DDEBUG
 endif
@@ -45,13 +56,15 @@ endif
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS		:=
+LIBS		:= 
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS		:=
+ifeq ($(PLATFORM),wiiu)
+LIBDIRS		:= $(WUT_ROOT)/usr
+endif
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -77,11 +90,9 @@ export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I$(CURDIR)/$(BUILD) \
-			-I$(LIBOGC_INC)
+            -I$(CURDIR)/$(BUILD) -I$(PORTLIBS)/include
 
-export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
-			-L$(LIBOGC_LIB)
+export LIBPATHS	:= $(foreach dir,$(LIBDIRS),-L$(dir)/lib) $(PORTLIBS)/lib
 
 .PHONY: $(BUILD) clean
 
@@ -93,7 +104,7 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr wii_debug wii_release cube_debug cube_release $(LIBDIR)
+	@rm -fr wii_debug wii_release wiiu_release cube_debug cube_release $(LIBDIR)
 
 all: $(NTFSBIN)
 
@@ -104,6 +115,10 @@ cube-install:
 wii-install:
 	cp ../include/ntfs.h $(PORTLIBS)/include
 	cp ../lib/wii/libntfs.a $(PORTLIBS)/lib
+
+wiiu-install:
+	cp ../include/ntfs.h $(WUT_ROOT)/usr/include
+	cp ../lib/wiiu/libntfs.a $(WUT_ROOT)/usr/lib
 
 #---------------------------------------------------------------------------------
 else

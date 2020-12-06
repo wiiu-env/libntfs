@@ -37,6 +37,7 @@
 #include "ntfsinternal.h"
 #include "ntfsdir.h"
 #include "ntfsfile.h"
+#include "lock.h"
 
 #if defined(__wii__)
 #include <sdcard/wiisd_io.h>
@@ -49,6 +50,15 @@ const INTERFACE_ID ntfs_disc_interfaces[] = {
     { "carda", &__io_gcsda },
     { "cardb", &__io_gcsdb },
     { NULL, NULL }
+};
+
+#elif defined (__WIIU__)
+    #include <iosuhax_disc_interface.h>
+
+const INTERFACE_ID ntfs_disc_interfaces[] = {
+	{"sd", &IOSUHAX_sdio_disc_interface},
+	{"usb", &IOSUHAX_usb_disc_interface},
+	{NULL, NULL}
 };
 
 #elif defined(__gamecube__)
@@ -190,7 +200,7 @@ int ntfsInitVolume (ntfs_vd *vd)
     }
 
     // Initialise the volume lock
-    LWP_MutexInit(&vd->lock, false);
+    _NTFS_lock_init(&vd->lock, false);
 
     // Reset the volumes name cache
     vd->name[0] = '\0';
@@ -253,7 +263,7 @@ void ntfsDeinitVolume (ntfs_vd *vd)
     ntfsUnlock(vd);
 
     // Deinitialise the volume lock
-    LWP_MutexDestroy(vd->lock);
+    _NTFS_lock_deinit((mutex_t *)vd->lock);
 
     return;
 }
