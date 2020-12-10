@@ -4,7 +4,7 @@ COPY --from=wiiuenv/libiosuhax:20200812 /artifacts $DEVKITPRO
 
 WORKDIR tmp_build
 COPY . .
-RUN make clean && make wiiu-release && mkdir -p /artifacts/wut/usr && cp -r lib /artifacts/wut/usr && cp -r include //artifacts/wut/usr
+RUN make clean && make wiiu-release && mkdir -p /artifacts/wut/usr && mkdir -p /artifacts/wut/usr/lib && cp lib/wiiu/libntfs.a /artifacts/wut/usr/lib && cp -r include /artifacts/wut/usr
 WORKDIR /artifacts
 
 FROM scratch
