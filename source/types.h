@@ -39,6 +39,18 @@
 #include "compat.h"
 #else /* GEKKO */
 
+#ifdef __WIIU__
+typedef int32_t BOOL;
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+#endif
+
 typedef uint8_t  u8;			/* Unsigned types of an exact size */
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -87,7 +99,8 @@ typedef sle64 leLSN;
  * Cygwin has a collision between our BOOL and <windef.h>'s
  * As long as this file will be included after <windows.h> were fine.
  */
-#ifndef GEKKO
+#ifndef GEKKO  
+#ifndef __WIIU__  
 #ifndef _WINDEF_H
 /**
  * enum BOOL - These are just to make the code more readable...
@@ -113,6 +126,7 @@ typedef enum {
 #endif
 } BOOL;
 #endif /* defined _WINDEF_H */
+#endif /* defined __WIIU__ */
 #endif /* defined GECKO */
 
 /**

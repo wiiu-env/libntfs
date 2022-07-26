@@ -25,14 +25,14 @@
 #include <malloc.h>
 
 static inline void* ntfs_alloc (size_t size) {
-    return malloc(size);
+    return memalign(0x40, size);
 }
 
 static inline void* ntfs_align (size_t size) {
     #ifdef __wii__
-    return memalign(32, size);
+    return memalign(0x40, size);
     #else
-    return malloc(size);
+    return memalign(0x40, size);
     #endif
 }
 

@@ -1,6 +1,6 @@
-FROM wiiuenv/devkitppc:20200810
+FROM wiiuenv/devkitppc:20220724
 
-COPY --from=wiiuenv/libiosuhax:20200812 /artifacts $DEVKITPRO
+COPY --from=wiiuenv/libmocha:20220726 /artifacts $DEVKITPRO
 
 WORKDIR tmp_build
 COPY . .

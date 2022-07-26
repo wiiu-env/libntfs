@@ -3,13 +3,13 @@
 ## Usage
 Link the application with:
 ```
--lntfs -liosuhax
+-lntfs -libmocha
 ```
 
 ## Dependencies
 To be able to use libntfs for the Wii u, you need to install the following dependencies:
 
-- [libiosuhax](https://github.com/wiiu-env/libiosuhax)
+- [libmocha](https://github.com/wiiu-env/libmocha)
 
 ## Building
 ```
@@ -21,5 +21,5 @@ The image `wiiuenv/libntfs` on [Docker Hub](https://hub.docker.com/r/wiiuenv/lib
 
 Example:  
 ```
-COPY --from=wiiuenv/libntfs:20201210 /artifacts $DEVKITPRO
+COPY --from=wiiuenv/libntfs:20220726 /artifacts $DEVKITPRO
 ```

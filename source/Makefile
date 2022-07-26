@@ -56,14 +56,14 @@ endif
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS		:= 
+LIBS		:= -lwut
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
 ifeq ($(PLATFORM),wiiu)
-LIBDIRS		:= $(WUT_ROOT)/usr
+LIBDIRS		:= $(WUT_ROOT)/usr $(WUT_ROOT)
 endif
 
 #---------------------------------------------------------------------------------

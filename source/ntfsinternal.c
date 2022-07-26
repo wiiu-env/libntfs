@@ -53,11 +53,9 @@ const INTERFACE_ID ntfs_disc_interfaces[] = {
 };
 
 #elif defined (__WIIU__)
-    #include <iosuhax_disc_interface.h>
-
 const INTERFACE_ID ntfs_disc_interfaces[] = {
-	{"sd", &IOSUHAX_sdio_disc_interface},
-	{"usb", &IOSUHAX_usb_disc_interface},
+	{"sd", &Mocha_sdio_disc_interface},
+	{"usb", &Mocha_usb_disc_interface},
 	{NULL, NULL}
 };
 
